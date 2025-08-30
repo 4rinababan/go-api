@@ -1,0 +1,922 @@
+basePath: /api
+definitions:
+  controllers.OrderInput:
+    properties:
+      address:
+        example: Jl. Mawar No. 123
+        type: string
+      company_name:
+        example: PT. ABC
+        type: string
+      details:
+        example: Pesanan baru dari Budi
+        type: string
+      priority:
+        example: normal
+        type: string
+      product_id:
+        example: 4cd64505-f56f-421b-9243-e6bc9cbbaa7b
+        type: string
+      quantity:
+        example: 2
+        type: integer
+      user:
+        properties:
+          address:
+            example: Jl. Mawar No. 123
+            type: string
+          email:
+            example: budi@email.com
+            type: string
+          id:
+            example: 4cd64505-f56f-421b-9243-e6bc9cbbaa7b
+            type: string
+          name:
+            example: Budi
+            type: string
+          phone:
+            example: "08123456789"
+            type: string
+        type: object
+    type: object
+  models.Category:
+    properties:
+      created_at:
+        type: string
+      detail:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      stock:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.Info:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      phone:
+        type: string
+      telephone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Order:
+    properties:
+      address:
+        description: delivery address
+        type: string
+      company_name:
+        description: name of the product
+        type: string
+      created_at:
+        type: string
+      details:
+        description: additional details about the order
+        type: string
+      id:
+        type: string
+      priority:
+        description: e.g., "low", "normal", "high"
+        type: string
+      product:
+        allOf:
+        - $ref: '#/definitions/models.Product'
+        description: optional preload
+      product_id:
+        description: FK to Product
+        type: string
+      quantity:
+        type: integer
+      status:
+        description: e.g., "pending", "completed",
+        type: string
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: optional preload
+      user_id:
+        description: UserID and ProductID are foreign keys to User and Product models
+        type: string
+    type: object
+  models.Product:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+      category_id:
+        type: string
+      created_at:
+        type: string
+      detail:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.User:
+    properties:
+      addreess:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      langitude:
+        description: bisa null
+        type: string
+      latitude:
+        description: bisa null
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      photo_url:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.UserAccount:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      password_hash:
+        type: string
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: optional preload
+      user_id:
+        description: FK to Category
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      data:
+        description: optional data
+      endpoint:
+        type: string
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  utils.SuccessResponse:
+    properties:
+      data: {}
+      endpoint:
+        type: string
+      message: {}
+      status:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@meishaalumuniumkaca.com
+    name: Ari Dev Team
+  description: API untuk manajemen produk dan kategori toko
+  termsOfService: http://swagger.io/terms/
+  title: API Meisha Alumunium Kaca
+  version: "1.0"
+paths:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of categories with pagination support
+      parameters:
+      - description: Page number (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page (default is 10)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all categories (paginated)
+      tags:
+      - Categories
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new category with name, detail, image_path, and icon
+      parameters:
+      - description: Category Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Category Detail
+        in: formData
+        name: detail
+        required: true
+        type: string
+      - description: Category Image
+        in: formData
+        name: image_path
+        required: true
+        type: file
+      - description: Category Icon
+        in: formData
+        name: icon
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a new category
+      tags:
+      - Categories
+  /categories/{category_id}/products:
+    get:
+      description: Retrieve products that belong to a specific category
+      parameters:
+      - description: Category ID
+        in: path
+        name: category_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get products by category ID
+      tags:
+      - Products
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category by ID and remove associated image/icon files
+      parameters:
+      - description: Category ID (UUID)
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete a category
+      tags:
+      - Categories
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update a category with optional image/icon replacement
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category Name
+        in: formData
+        name: name
+        type: string
+      - description: Category Detail
+        in: formData
+        name: detail
+        type: string
+      - description: Category Image
+        in: formData
+        name: image_path
+        type: file
+      - description: Category Icon
+        in: formData
+        name: icon
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update a category
+      tags:
+      - Categories
+  /info:
+    get:
+      description: Retrieve site information such as phone, address, and location
+        coordinates
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get site information
+      tags:
+      - Info
+    post:
+      consumes:
+      - application/json
+      description: Create or update site information such as phone, address, and location
+        coordinates
+      parameters:
+      - description: Site Information
+        in: body
+        name: info
+        required: true
+        schema:
+          $ref: '#/definitions/models.Info'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Upsert site information
+      tags:
+      - Info
+  /orders:
+    get:
+      description: Retrieve all orders with user and product details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Order'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all orders
+      tags:
+      - Orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order, save user if not exists, and send notification
+        via WebSocket
+      parameters:
+      - description: Order Input
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.OrderInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a new order and notify via WebSocket
+      tags:
+      - Orders
+  /orders/{id}:
+    get:
+      description: Retrieve an order by its ID with user and product details
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Order'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get order by ID
+      tags:
+      - Orders
+  /orders/user/{userid}:
+    get:
+      description: Retrieve all orders for a specific user by user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Order'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get orders by user ID
+      tags:
+      - Orders
+  /products:
+    get:
+      description: Retrieve a list of all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all products
+      tags:
+      - Products
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new product with name, detail, category_id, and multiple
+        images
+      parameters:
+      - description: Product Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Product Detail (as integer)
+        in: formData
+        name: detail
+        required: true
+        type: string
+      - description: Category ID (UUID)
+        in: formData
+        name: category_id
+        required: true
+        type: string
+      - description: Product Images (multiple upload allowed)
+        in: formData
+        name: images
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a new product
+      tags:
+      - Products
+  /products/{id}:
+    delete:
+      description: Delete a product by ID and its images
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete a product
+      tags:
+      - Products
+    get:
+      description: Retrieve a product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get product by ID
+      tags:
+      - Products
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update product details and optionally replace images
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product Name
+        in: formData
+        name: name
+        type: string
+      - description: Product Detail (as integer)
+        in: formData
+        name: detail
+        type: string
+      - description: Category ID (UUID)
+        in: formData
+        name: category_id
+        type: string
+      - description: Product Images (multiple upload allowed)
+        in: formData
+        name: images
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update a product
+      tags:
+      - Products
+  /products/best-selling:
+    get:
+      description: Get top 10 best-selling products for the current month
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get best selling products
+      tags:
+      - Products
+  /user-accounts:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with name, password, and user ID
+      parameters:
+      - description: User Account Input
+        in: body
+        name: user_account
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserAccount'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserAccount'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a new user account
+      tags:
+      - User Accounts
+  /user-accounts/password:
+    patch:
+      consumes:
+      - application/json
+      description: Update the password for a user account
+      parameters:
+      - description: Password Update Input
+        in: body
+        name: input
+        required: true
+        schema:
+          properties:
+            new_password:
+              type: string
+            old_password:
+              type: string
+            user_account_id:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password berhasil diperbarui
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update user account password
+      tags:
+      - User Accounts
+  /users:
+    get:
+      description: Retrieve a list of all registered users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Register new user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      description: Delete a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete user
+      tags:
+      - Users
+    get:
+      description: Retrieve user details by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get user by ID
+      tags:
+      - Users
+    patch:
+      responses: {}
+swagger: "2.0"
