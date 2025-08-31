@@ -114,7 +114,7 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request, userID, role string) {
 	// (Opsional) agar aman lewat Nginx
 	w.Header().Set("X-Accel-Buffering", "no")
 	// (Atur sesuai domain FE kamu)
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	// w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Pastikan flusher tersedia
 	flusher, ok := w.(http.Flusher)
