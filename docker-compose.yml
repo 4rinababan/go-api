@@ -14,7 +14,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"  # ✅ Ubah host port jadi 5433
+      - "5433:5432"
 
   api:
     build:
@@ -24,7 +24,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8081:8080" # ✅ Ubah host port jadi 8081
+      - "8081:8080"
     volumes:
       - ./uploads:/app/uploads
     environment:
@@ -33,13 +33,11 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    env_file:
-      - .env
 
   prometheus:
     image: prom/prometheus
     ports:
-      - "9091:9090" # ✅ Ubah host port jadi 9091
+      - "9091:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
@@ -47,7 +45,7 @@ services:
     image: redis:7
     restart: always
     ports:
-      - "6380:6379" # ✅ Ubah host port jadi 6380
+      - "6380:6379"
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data

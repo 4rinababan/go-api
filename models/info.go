@@ -9,11 +9,14 @@ import (
 
 type Info struct {
 	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey"`
-	Phone     string    `json:"phone"`
-	Telephone string    `json:"telephone"`
-	Address   string    `json:"address"`
-	Latitude  float64   `json:"latitude"`
-	Longitude float64   `json:"longitude"`
+	Name      string    `json:"name" form:"name"`
+	Detail    string    `json:"detail" form:"detail"`
+	Phone     string    `json:"phone" form:"phone"`
+	Telephone string    `json:"telephone" form:"telephone"`
+	Address   string    `json:"address" form:"address"`
+	ImagePath string    `json:"image_path"`
+	Latitude  float64   `json:"latitude" form:"latitude"`
+	Longitude float64   `json:"longitude" form:"longitude"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

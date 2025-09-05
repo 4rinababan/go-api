@@ -319,12 +319,13 @@ func GetNotification(c *gin.Context) {
 func GetAdminNotifications(c *gin.Context) {
 	var notifications []models.Notification
 
-	// Query untuk ambil semua notifikasi yang message mengandung "📦 Pesanan Dibuat"
+	// Query: hanya Read = true, message mengandung "📦 Pesanan Dibuat", urut created_at desc, limit 20
 	if err := config.DB.
 		Preload("Order.Product").
 		Preload("Order.User").
 		Where("message LIKE ?", "%📦 Pesanan Dibuat%").
-		Order("created_at DESC").
+		Order("CASE WHEN read = false THEN 0 ELSE 1 END, created_at DESC").
+		Limit(20).
 		Find(&notifications).Error; err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to get notifications", nil)
 		return

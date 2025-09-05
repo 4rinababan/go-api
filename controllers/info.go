@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/ary/go-api/config"
@@ -45,15 +46,32 @@ func GetInfo(c *gin.Context) {
 func UpsertInfo(c *gin.Context) {
 	var input models.Info
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", nil)
+	// Bind form data (support multipart/form-data)
+	if err := c.ShouldBind(&input); err != nil {
+		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid form data", nil)
 		return
 	}
 
+	// Handle file upload
+	file, err := c.FormFile("photo")
+	if err != nil {
+		fmt.Println("Photo not received or error:", err)
+	} else {
+		// Simpan file ke folder 'uploads'
+		filePath := "uploads/" + file.Filename
+		if err := c.SaveUploadedFile(file, filePath); err != nil {
+			utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to upload photo", nil)
+			return
+		}
+		input.ImagePath = filePath
+		fmt.Println("Photo saved to:", filePath)
+	}
+
 	var existing models.Info
-	err := config.DB.First(&existing).Error
+	err = config.DB.First(&existing).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		// Insert baru
 		if err := config.DB.Create(&input).Error; err != nil {
 			utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to create info", nil)
 			return
@@ -65,7 +83,7 @@ func UpsertInfo(c *gin.Context) {
 		return
 	}
 
-	// Update existing record
+	// Update record lama
 	if err := config.DB.Model(&existing).Updates(input).Error; err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to update info", nil)
 		return

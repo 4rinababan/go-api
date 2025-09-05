@@ -1,0 +1,18 @@
+services:
+  api:
+    environment:
+      ENV: production
+    env_file:
+      - .env.prod
+
+  db:
+    ports:
+      - "5432:5432" # Production pakai default port
+
+  redis:
+    ports:
+      - "6379:6379" # Production pakai default port
+
+  prometheus:
+    ports:
+      - "9090:9090" # Default port
