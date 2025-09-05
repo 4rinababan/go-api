@@ -14,9 +14,9 @@ type Info struct {
 	Phone     string    `json:"phone" form:"phone"`
 	Telephone string    `json:"telephone" form:"telephone"`
 	Address   string    `json:"address" form:"address"`
-	ImagePath string    `json:"image_path"`
-	Latitude  float64   `json:"latitude" form:"latitude"`
-	Longitude float64   `json:"longitude" form:"longitude"`
+	ImagePath string    `json:"image_path"  form:"image_path"`
+	Latitude  *float64  `json:"latitude" form:"latitude"`
+	Longitude *float64  `json:"longitude" form:"longitude"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
