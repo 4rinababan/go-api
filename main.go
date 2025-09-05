@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/ary/go-api/config"
-	"github.com/ary/go-api/middlewares"
 	"github.com/ary/go-api/routes"
 	"github.com/ary/go-api/utils"
 
@@ -28,7 +27,7 @@ func main() {
 	config.ConnectRedis()
 	go ws.H.Run() // ⬅️ jalanin hub websocket
 	r.Static("/uploads", "./uploads")
-	r.Use(middlewares.CORSMiddleware())
+	// r.Use(middlewares.CORSMiddleware()) //development
 	routes.RegisterRoutes(r)
 
 	r.Run(":8080")
