@@ -8,8 +8,8 @@ import (
 	"github.com/ary/go-api/config"
 	"github.com/ary/go-api/models"
 	"github.com/ary/go-api/utils"
-
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // @Summary Get all users
@@ -126,6 +126,7 @@ func CheckUserIsActive(c *gin.Context) {
 // @Failure 400 {object} utils.ErrorResponse
 // @Failure 500 {object} utils.ErrorResponse
 // @Router /users [post]
+
 func CreateUser(c *gin.Context) {
 	var user models.User
 
@@ -133,6 +134,9 @@ func CreateUser(c *gin.Context) {
 		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
+
+	// Generate UUID jika tidak dikirim dari JSON
+	user.ID = uuid.New()
 
 	if err := config.DB.Create(&user).Error; err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to create user")
