@@ -93,11 +93,11 @@ func CreateCategory(c *gin.Context) {
 		utils.SendErrorResponse(c, http.StatusBadRequest, "image_path is required", nil)
 		return
 	}
-	iconFile, err := c.FormFile("icon")
-	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "icon is required", nil)
-		return
-	}
+	// iconFile, err := c.FormFile("icon")
+	// if err != nil {
+	// 	utils.SendErrorResponse(c, http.StatusBadRequest, "icon is required", nil)
+	// 	return
+	// }
 
 	ext := filepath.Ext(imageFile.Filename)
 	cleanUUID := strings.ReplaceAll(uuid.New().String(), "-", "")
@@ -109,21 +109,21 @@ func CreateCategory(c *gin.Context) {
 		return
 	}
 
-	iconExt := filepath.Ext(iconFile.Filename)
-	cleanUUID2 := strings.ReplaceAll(uuid.New().String(), "-", "")
-	iconName := fmt.Sprintf("%s%s", cleanUUID2, iconExt)
-	iconPath := "uploads/" + iconName
+	// iconExt := filepath.Ext(iconFile.Filename)
+	// cleanUUID2 := strings.ReplaceAll(uuid.New().String(), "-", "")
+	// iconName := fmt.Sprintf("%s%s", cleanUUID2, iconExt)
+	// iconPath := "uploads/" + iconName
 
-	if err := c.SaveUploadedFile(iconFile, iconPath); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to save icon", nil)
-		return
-	}
+	// if err := c.SaveUploadedFile(iconFile, iconPath); err != nil {
+	// 	utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to save icon", nil)
+	// 	return
+	// }
 
 	category := models.Category{
 		Name:      name,
 		Detail:    detail,
 		ImagePath: imagePath,
-		Icon:      iconPath,
+		// Icon:      iconPath,
 	}
 
 	if err := config.DB.Create(&category).Error; err != nil {
