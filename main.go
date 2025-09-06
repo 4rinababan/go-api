@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/ary/go-api/config"
+	// "github.com/ary/go-api/middlewares"
 	"github.com/ary/go-api/routes"
 	"github.com/ary/go-api/utils"
 
