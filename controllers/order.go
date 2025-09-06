@@ -77,7 +77,7 @@ func GetAllOrders(c *gin.Context) {
 
 	// Ambil parameter query, default page=1 dan limit=10
 	pageStr := c.DefaultQuery("page", "1")
-	limitStr := c.DefaultQuery("limit", "10")
+	limitStr := c.DefaultQuery("limit", "5")
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page < 1 {
@@ -99,7 +99,10 @@ func GetAllOrders(c *gin.Context) {
 
 	// Ambil data dengan pagination dan preload relasi
 	if err := config.DB.Preload("User").Preload("Product").
-		Limit(limit).Offset(offset).Find(&orders).Error; err != nil {
+		Order(`CASE WHEN status = 'Menunggu konfirmasi' THEN 0 ELSE 1 END`).
+		Order("created_at DESC").
+		Limit(limit).Offset(offset).
+		Find(&orders).Error; err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to get orders", nil)
 		return
 	}
@@ -111,6 +114,7 @@ func GetAllOrders(c *gin.Context) {
 		"limit":      limit,
 		"total":      total,
 		"totalPages": (total + int64(limit) - 1) / int64(limit), // hitung total pages
+
 	}
 
 	utils.SendSuccessResponse(c, http.StatusOK, "Success", response)
